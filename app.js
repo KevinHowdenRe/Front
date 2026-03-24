@@ -214,7 +214,7 @@ function openPage(section, pageId) {
   // iframe can’t send Authorization header => token in querystring
   const urlPath = `/${encodeURIComponent(siteId)}/${encodeURIComponent(section)}/${encodeURIComponent(pageId)}`;
   const src = base + urlPath + "?t=" + encodeURIComponent(token);
-
+  showSpinner("Chargement de la page…");
   $("frame").src = src;
   $("currentUrl").textContent = urlPath;
 }
@@ -292,6 +292,45 @@ $("btnLoadMenu").onclick = async () => {
     setStatus("Menu error: " + e.message, true);
   }
 };
+let spinnerTimer = null;
 
+function showSpinner(msg = "Chargement…") {
+  const sp = document.getElementById("spinner");
+  if (!sp) return;
+
+  // optionnel: changer le texte
+  const label = sp.querySelector("div div:last-child");
+  if (label) label.textContent = msg;
+
+  sp.style.display = "flex";
+
+  // sécurité: auto-hide au bout de X sec pour éviter spinner infini
+  clearTimeout(spinnerTimer);
+  spinnerTimer = setTimeout(() => {
+    hideSpinner();
+    // optionnel: message UX
+    // setStatus("Chargement plus long que prévu…", true);
+  }, 15000);
+}
+
+function hideSpinner() {
+  const sp = document.getElementById("spinner");
+  if (!sp) return;
+  sp.style.display = "none";
+  clearTimeout(spinnerTimer);
+  spinnerTimer = null;
+}
+
+// attach once
+(function bindFrameSpinner(){
+  const frame = document.getElementById("frame");
+  if (!frame) return;
+
+  frame.addEventListener("load", () => hideSpinner());
+  frame.addEventListener("error", () => {
+    hideSpinner();
+    setStatus("Erreur de chargement iframe (blocked / 404 / 500).", true);
+  });
+})();
 // Start
 boot();
