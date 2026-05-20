@@ -1,99 +1,482 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Portal</title>
+  <title>HAL</title>
   <style>
-    :root { --border:#e5e7eb; --bg:#fff; --muted:#6b7280; --link:#2563eb; }
-    body{font-family:Arial,system-ui;margin:0;height:100vh;display:flex;background:var(--bg)}
-    aside{width:320px;border-right:1px solid var(--border);padding:14px;box-sizing:border-box}
-    main{flex:1;padding:14px;box-sizing:border-box}
-    input,select,button{width:100%;padding:10px;margin:6px 0;box-sizing:border-box}
-    button{cursor:pointer}
-    .row{margin:8px 0}
-    .muted{color:var(--muted);font-size:12px}
-    .sec{margin-top:14px}
-    .sec h4{margin:10px 0 6px 0}
-    a{display:block;padding:6px 0;color:var(--link);text-decoration:none}
-    a:hover{text-decoration:underline}
-    iframe{width:100%;height:86vh;border:1px solid var(--border);border-radius:8px}
-    .pill{display:inline-block;padding:2px 8px;border:1px solid var(--border);border-radius:999px;font-size:12px;margin-left:6px;color:var(--muted)}
-    .danger{color:#b91c1c}
+  :root{
+  --border:#e5e7eb;
+  --muted:#6b7280;
+  --link:#2563eb;
+  --bg:#ffffff;
+  --soft:#f9fafb;
+  --text:#111827;
+
+  /* couleur UI sidebar + accent */
+  --accent:#218D80;
+  --sidebar:#173F35;
+}
+
+/* =========================================================
+   BASE LAYOUT
+   ========================================================= */
+
+*{ box-sizing:border-box; }
+
+body{
+  font-family: Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  margin:0;
+  height:100vh;
+  display:flex;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* =========================================================
+   SIDEBAR (aside)
+   ========================================================= */
+
+aside{
+  width:320px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  overflow:hidden;
+
+  background:var(--sidebar);
+  color:#fff;
+  border-right:1px solid rgba(255,255,255,0.12);
+}
+
+aside .muted{
+  color:rgba(255,255,255,0.75);
+}
+
+aside select{
+  background:rgba(255,255,255,0.10);
+  border:1px solid rgba(255,255,255,0.18);
+  color:#fff;
+  border-radius:0;
+}
+aside select option{
+  color:#111827;
+}
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+main{
+  flex:1;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  min-width:0;
+}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.title{
+  font-weight:750;
+  font-size:24px;
+  letter-spacing:0.2px;
+  margin:0 0 18px 0;
+}
+
+/* =========================================================
+   UI CONTROLS (flat)
+   ========================================================= */
+
+.btn{
+  border:1px solid var(--border);
+  background:#fff;
+  padding:8px 10px;
+  border-radius:0;
+  cursor:pointer;
+  font-size:13px;
+}
+.btn:hover{ background:var(--soft); }
+
+.muted{ color:var(--muted); font-size:12px; }
+
+select{
+  width:100%;
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:0;
+  background:#fff;
+}
+
+/* =========================================================
+   LEFT MENU
+   ========================================================= */
+
+#audienceWrap{ margin-bottom:16px; }
+
+#menu{
+  overflow:auto;
+  padding-right:4px;
+  padding-top:10px;
+  border-top:none !important;
+}
+
+a.menu-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:7px 0;
+  text-decoration:none;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  border-bottom:1px solid rgba(255,255,255,0.12);
+
+  /* par défaut: sidebar => blanc */
+  color:#fff;
+  font-weight:700;
+}
+a.menu-item:hover{
+  background:rgba(255,255,255,0.06);
+  text-decoration:none;
+}
+
+a.menu-item .count{
+  color:rgba(255,255,255,0.75);
+  font-weight:600;
+  font-size:12px;
+  flex:0 0 auto;
+}
+
+/* état actif flat */
+a.menu-item.active{
+  background:var(--accent);
+  border-radius:0;
+  padding-left:10px;
+  padding-right:10px;
+}
+a.menu-item.active .count{
+  color:rgba(255,255,255,0.9);
+}
+
+/* Si jamais tu as un menu hors sidebar, tu peux le remettre en bleu en ajoutant une classe au container.
+   (Ici, on garde ton comportement principal: menu dans aside => blanc.) */
+
+/* Pills (flat) */
+.pill{
+  display:inline-block;
+  padding:2px 8px;
+  border:1px solid var(--border);
+  border-radius:0;
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+
+/* Sections */
+#fixedTop{ margin-bottom:4px; }
+#fixedBottom{ margin-top:6px; margin-bottom:12px; }
+#fixedTop, #fixedBottom{ border:0 !important; padding:0; }
+
+/* =========================================================
+   IFRAME + SPINNER
+   ========================================================= */
+
+#frameWrap{ position:relative; flex:1; min-height:0; }
+
+#spinner{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,0.75);
+  backdrop-filter:blur(2px);
+  z-index:10;
+}
+#spinner .dot{
+  width:34px;
+  height:34px;
+  border:4px solid #ddd;
+  border-top-color:var(--link);
+  border-radius:0;
+  display:inline-block;
+  animation:spin 0.8s linear infinite;
+}
+#spinner .label{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:13px;
+  text-align:center;
+}
+@keyframes spin{ to{ transform:rotate(360deg);} }
+
+iframe{
+  width:100%;
+  height:100%;
+  border:none;
+  border-radius:0;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+#status{ color:var(--muted); font-size:12px; }
+.danger{ color:#b91c1c; }
+
+/* =========================================================
+   SWEETALERT2 (site-like + flat + no ghost buttons)
+   ========================================================= */
+
+body.swal2-shown.swal2-height-auto{
+  height:100vh !important;
+  padding-bottom:0 !important;
+}
+
+/* même police que le site */
+.swal2-container,
+.swal2-popup,
+.swal2-title,
+.swal2-html-container,
+.swal2-input,
+.swal2-textarea,
+.swal2-select,
+.swal2-validation-message,
+.swal2-confirm,
+.swal2-deny,
+.swal2-cancel{
+  font-family: inherit !important;
+}
+
+/* popup */
+.swal2-popup{
+  border-radius:0 !important;
+  padding:18px 22px !important;
+  max-width:440px !important;
+  box-shadow:0 12px 34px rgba(0,0,0,.22) !important;
+  text-align:left !important; /* rend tout cohérent */
+}
+
+/* title */
+.swal2-title{
+  color:var(--text) !important;
+  font-size:22px !important;
+  font-weight:750 !important;
+  letter-spacing:-0.01em !important;
+  margin:0 0 10px 0 !important;
+  text-align:left !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* text */
+.swal2-html-container{
+  text-align:left !important;
+  color:var(--text) !important;
+  font-size:13px !important;
+  line-height:1.5 !important;
+  margin:0 0 12px 0 !important;
+  padding:0 !important;
+  font-weight:500 !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.swal2-html-container p{
+  margin:0 0 6px 0 !important;
+}
+
+/* input */
+.swal2-input{
+  width:100% !important;
+  max-width:360px !important;
+  margin:6px 0 14px 0 !important; /* aligné gauche */
+  border-radius:0 !important;
+
+  height:38px !important;
+  padding:8px 10px !important;
+  font-size:13px !important;
+
+  border:1px solid rgba(15,23,42,.18) !important;
+  box-shadow:none !important;
+}
+.swal2-input:focus{
+  border-color: rgba(33,141,128,.55) !important;
+  box-shadow: 0 0 0 2px rgba(33,141,128,.12) !important;
+}
+
+/* boutons couleur */
+.swal2-confirm{ background-color: var(--sidebar) !important; color:#fff !important; }
+.swal2-deny{    background-color: #EEA000 !important;      color:#fff !important; }
+.swal2-cancel{  background-color: #6b7280 !important;      color:#fff !important; }
+
+/* boutons style (IMPORTANT: on ne force PAS display en !important) */
+.swal2-confirm,
+.swal2-deny,
+.swal2-cancel{
+  border-radius:0 !important;
+  height:36px !important;
+  line-height:36px !important;
+  padding:0 14px !important;
+  font-size:13px !important;
+  font-weight:700 !important;
+  border:none !important;
+  margin:0 !important;
+  box-shadow:none !important;
+  letter-spacing:0 !important;
+}
+
+/* actions: on garde l'alignement mais sans !important sur display
+   => SweetAlert peut cacher la zone quand showConfirmButton:false */
+.swal2-actions{
+  display:flex;
+  justify-content:flex-start;
+  align-items:center;
+  gap:10px;
+  margin:0;
+  padding:0;
+}
+
+/* Respecter display:none inline sur les boutons (anti "ghost buttons") */
+.swal2-confirm[style*="display: none"],
+.swal2-deny[style*="display: none"],
+.swal2-cancel[style*="display: none"]{
+  display:none !important;
+}
+
+/* Email ligne (si utilisée dans ton HTML) */
+.swal-email{
+  margin:0 0 10px 0 !important;
+  font-weight:700 !important;
+  color:var(--text) !important;
+  font-size:13px !important;
+}
+
+/* backdrop */
+.swal2-backdrop-show{
+  background:rgba(0,0,0,.32) !important;
+}
+
+/* =========================================================
+   MOBILE RESPONSIVE
+   ========================================================= */
+
+@media (max-width:820px){
+  body{
+    display:block;
+    height:100vh;
+    overflow:hidden;
+  }
+
+  main{
+    height:100vh;
+    padding:10px;
+  }
+
+  .topbar{
+    position:sticky;
+    top:0;
+    z-index:5;
+    background:var(--bg);
+    padding:10px 0;
+  }
+
+  aside{
+    position:fixed;
+    top:0;
+    left:0;
+    height:100vh;
+    width:min(86vw, 360px);
+    z-index:20;
+
+    transform:translateX(-105%);
+    transition:transform .22s ease;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+
+  body.menu-open aside{
+    transform:translateX(0);
+  }
+
+  #overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.35);
+    z-index:15;
+    display:none;
+  }
+  body.menu-open #overlay{
+    display:block;
+  }
+
+  #frameWrap{
+    height:calc(100vh - 64px);
+    min-height:0;
+  }
+}
+
+/* bouton menu */
+#btnMenu{ display:none; }
+@media (max-width:820px){
+  #btnMenu{ display:inline-block; }
+}
   </style>
 </head>
-<body>
+
+<body class="portal">
+<div id="overlay" aria-hidden="true"></div>
   <aside>
-    <div class="row">
-      <label class="muted">API base (backend)</label>
-      <input id="apiBase" placeholder="https://<user>.pythonanywhere.com" />
-      <div class="muted">Astuce: mets ça en variable Vercel via <span class="pill">window.__APP_CONFIG__</span> (voir app.js)</div>
-    </div>
+    <div>
+      <div class="title">HAL</div>
+      <div id="audienceWrap" style="display:none;">
+ <br>
+ <br>
+  <div>
+    <div class="muted" style="margin-bottom:6px;">Audience</div>
+    <select id="audience"></select>
+  </div>
+  <br>
+ <br>
+</div>
+	<div id="fixedTop"></div>
+    <div id="menu"></div>
+	<div id="fixedBottom"></div>
 
-    <div class="row">
-      <label class="muted">site_id</label>
-      <input id="siteId" value="portalA" />
-    </div>
-
-    <div class="sec">
-      <h4>Login</h4>
-      <input id="email" placeholder="email" autocomplete="username" />
-      <input id="password" placeholder="password" type="password" autocomplete="current-password" />
-      <button id="btnLogin">Login</button>
-      <button id="btnLogout">Logout</button>
-      <div class="muted">Token stocké en localStorage (simple). Tu peux l’enlever plus tard.</div>
-    </div>
-
-    <div class="sec">
-      <h4>Vue (audience)</h4>
-      <select id="audience"></select>
-      <button id="btnSetAudience">Activer la vue</button>
-      <div class="muted">La vue active est stockée côté serveur (active_context).</div>
-    </div>
-
-    <div class="sec">
-      <h4>Menu</h4>
-      <button id="btnLoadMenu">Charger menu</button>
-      <div id="menu"></div>
-    </div>
-
-    <div class="sec muted" id="status"></div>
+    <div id="status"></div>
   </aside>
 
   <main>
-    <div class="row">
-      <strong>Page</strong>
+    <div class="topbar">
       <span class="pill" id="currentUrl">-</span>
-    </div>
-    <div id="frameWrap" style="position:relative;">
-  <div id="spinner" style="
-      position:absolute; inset:0;
-      display:none;
-      align-items:center; justify-content:center;
-      background:rgba(255,255,255,0.75);
-      backdrop-filter: blur(2px);
-      z-index:10;
-      font-family: Arial, system-ui;
-    ">
-    <div style="text-align:center;">
-      <div style="
-        width:34px;height:34px;border:4px solid #ddd;border-top-color:#2563eb;
-        border-radius:50%; display:inline-block; animation:spin 0.8s linear infinite;
-      "></div>
-      <div style="margin-top:10px;color:#6b7280;font-size:13px;">Chargement…</div>
-    </div>
-  </div>
-
-  <iframe id="frame" referrerpolicy="no-referrer"
-          style="width:100%;height:86vh;border:1px solid #e5e7eb;border-radius:8px;"></iframe>
+      <div style="display:flex; gap:8px; align-items:center;">
+  <button class="btn" id="btnMenu" aria-label="Open menu">Menu</button>
+  <button class="btn" id="btnAuth">Login</button>
 </div>
 
-<style>
-@keyframes spin { to { transform: rotate(360deg); } }
-</style>
-    <div class="muted">L’iframe appelle <span class="pill">/{site}/{section}/{page}?t=TOKEN</span></div>
-  </main>
+    </div>
 
-  <script src="app.js"></script>
+    <div id="frameWrap">
+      <div id="spinner">
+        <div style="text-align:center;">
+          <div class="dot"></div>
+          <div class="label">Loading…</div>
+        </div>
+      </div>
+      <iframe id="frame" referrerpolicy="no-referrer"></iframe>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
